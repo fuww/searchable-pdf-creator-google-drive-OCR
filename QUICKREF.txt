@@ -1,0 +1,97 @@
+┌─────────────────────────────────────────────────────────────────┐
+│                  MISTRAL OCR - QUICK REFERENCE                  │
+└─────────────────────────────────────────────────────────────────┘
+
+SETUP
+─────
+export MISTRAL_API_KEY="your_key_here"
+./setup.sh                          # Interactive setup
+
+or with Nix:
+nix develop                         # Enter dev environment
+
+
+GOOGLE DRIVE BATCH OCR (Main Tool)
+──────────────────────────────────
+# Test with 5 files, save locally
+uv run gdrive_batch_ocr.py --max-files 5 --local-only
+
+# Process entire drive, upload results
+uv run gdrive_batch_ocr.py
+
+# Process specific folder with 5 workers
+uv run gdrive_batch_ocr.py \
+  --folder-id 1abc123xyz \
+  --workers 5
+
+# Save locally instead of uploading
+uv run gdrive_batch_ocr.py \
+  --local-only \
+  --output ./my_ocr_results
+
+
+LOCAL FILE PROCESSING
+─────────────────────
+# Check if PDFs are searchable
+uv run check_pdf_searchable.py *.pdf
+
+# OCR single file
+uv run mistral_ocr.py document.pdf
+
+# OCR single file with embedded images
+uv run mistral_ocr.py document.pdf --inline-images
+
+# Batch process local directory
+uv run batch_ocr.py ~/pdfs/ ~/output/
+
+
+OPTIONS (gdrive_batch_ocr.py)
+─────────────────────────────
+--folder-id ID        Source folder in Google Drive
+--output-folder ID    Output folder in Google Drive  
+--local-only          Save locally instead of uploading
+--output PATH         Local output dir (default: ./ocr_output)
+--max-files N         Limit number of files
+--workers N           Parallel workers (default: 3)
+
+
+OUTPUT STRUCTURE
+────────────────
+Google Drive:
+  OCR_Output/
+  ├── doc1_ocr/
+  │   ├── doc1.md
+  │   ├── img-0.jpg
+  │   └── img-1.jpg
+
+Local:
+  ocr_output/
+  ├── doc1.md
+  ├── doc1_images/
+  │   ├── img-0.jpg
+
+
+COSTS
+─────
+~$1 per 1000 pages  (or $0.50 with batch API)
+Example: 100 PDFs × 10 pages = ~$1
+
+
+TIPS
+────
+• Start with --max-files 5 to test
+• Use --local-only to inspect before uploading
+• Reduce --workers if hitting rate limits
+• Script auto-skips searchable PDFs
+
+
+TROUBLESHOOTING
+───────────────
+Authentication error:
+  rm ~/.gdrive_token.json
+  
+Rate limit:
+  Reduce --workers or add delays
+
+Missing credentials.json:
+  https://console.cloud.google.com/apis/credentials
