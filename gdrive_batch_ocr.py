@@ -44,6 +44,17 @@ import pypdfium2 as pdfium
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
 
+def load_env_file(env_file: Path = Path(".env.local")):
+    """Load environment variables from .env.local file if it exists."""
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ.setdefault(key.strip(), value.strip())
+
+
 def get_drive_service():
     """Authenticate and return Google Drive service."""
     creds = None
@@ -346,7 +357,10 @@ def batch_process(
 
 def main():
     import argparse
-    
+
+    # Load .env.local if it exists
+    load_env_file()
+
     parser = argparse.ArgumentParser(
         description="Batch OCR Google Drive PDFs with Mistral",
         formatter_class=argparse.RawDescriptionHelpFormatter,

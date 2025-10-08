@@ -5,6 +5,7 @@ Batch process non-searchable PDFs in Google Drive using Mistral OCR. Extracts ma
 ## Features
 
 - ✅ Detects non-searchable PDFs automatically
+- ✅ **OCR JPG/PNG/GIF/WebP images** (new!)
 - ✅ Parallel processing (configurable workers)
 - ✅ Extracts text as markdown with preserved structure
 - ✅ Saves embedded images separately
@@ -26,8 +27,11 @@ nix run .#gdrive-batch-ocr -- --help
 ### With uv
 
 ```bash
-# All scripts use inline dependencies, just run them
-export MISTRAL_API_KEY="your_key_here"
+# Copy the example env file and add your API key
+cp .env.local.example .env.local
+# Edit .env.local and add your MISTRAL_API_KEY
+
+# All scripts use inline dependencies and auto-load .env.local
 uv run gdrive_batch_ocr.py --help
 ```
 
@@ -80,6 +84,19 @@ uv run batch_ocr.py ~/Documents/pdfs/ ~/ocr_output/
 
 # Single file
 uv run mistral_ocr.py document.pdf --inline-images
+```
+
+### OCR JPG/PNG images
+
+```bash
+# OCR a single image
+uv run example_usage.py  # Uncomment example_ocr_jpg()
+
+# Batch OCR multiple images
+uv run example_usage.py  # Uncomment example_batch_ocr_images()
+
+# OCR mixed PDFs and images from a directory
+uv run example_usage.py  # Uncomment example_ocr_mixed_documents()
 ```
 
 ## Output Structure

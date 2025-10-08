@@ -23,6 +23,17 @@ from pathlib import Path
 from mistralai import Mistral
 
 
+def load_env_file(env_file: Path = Path(".env.local")):
+    """Load environment variables from .env.local file if it exists."""
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ.setdefault(key.strip(), value.strip())
+
+
 def encode_pdf(pdf_path: Path) -> str:
     """Encode PDF file as base64."""
     with open(pdf_path, "rb") as f:
@@ -99,15 +110,18 @@ def ocr_pdf_batch(pdf_path: Path, inline_images: bool = False) -> str:
 
 def main():
     import argparse
-    
+
+    # Load .env.local if it exists
+    load_env_file()
+
     parser = argparse.ArgumentParser(description="OCR PDFs with Mistral OCR")
     parser.add_argument("pdf_file", type=Path, help="PDF file to OCR")
     parser.add_argument("-o", "--output", type=Path, help="Output markdown file")
-    parser.add_argument("--inline-images", action="store_true", 
+    parser.add_argument("--inline-images", action="store_true",
                        help="Include images inline as base64")
     parser.add_argument("--batch", action="store_true",
                        help="Use batch API (cheaper but async)")
-    
+
     args = parser.parse_args()
     
     if not args.pdf_file.exists():

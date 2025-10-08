@@ -14,7 +14,6 @@
         python = pkgs.python312;
         
         pythonEnv = python.withPackages (ps: with ps; [
-          mistralai
           google-auth
           google-auth-oauthlib
           google-auth-httplib2
@@ -40,7 +39,13 @@
             echo "  uv run gdrive_batch_ocr.py     - Batch Google Drive PDFs"
             echo "  uv run check_pdf_searchable.py - Check if PDFs are searchable"
             echo ""
-            echo "Set MISTRAL_API_KEY before running"
+            if [ -f .env.local ]; then
+              export $(cat .env.local | grep -v '^#' | xargs)
+              echo "✓ Loaded .env.local"
+            else
+              echo "⚠ No .env.local found - copy .env.local.example and add your MISTRAL_API_KEY"
+            fi
+            echo ""
           '';
         };
         

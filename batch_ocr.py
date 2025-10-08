@@ -18,6 +18,17 @@ from mistralai import Mistral
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
+def load_env_file(env_file: Path = Path(".env.local")):
+    """Load environment variables from .env.local file if it exists."""
+    if env_file.exists():
+        with open(env_file) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ.setdefault(key.strip(), value.strip())
+
+
 def encode_pdf(pdf_path: Path) -> str:
     """Encode PDF file as base64."""
     with open(pdf_path, "rb") as f:
@@ -116,10 +127,13 @@ def batch_ocr(input_dir: Path, output_dir: Path, max_workers: int = 4):
 
 
 def main():
+    # Load .env.local if it exists
+    load_env_file()
+
     if len(sys.argv) < 2:
         print("Usage: uv run batch_ocr.py <input_dir> [output_dir]")
         sys.exit(1)
-    
+
     input_dir = Path(sys.argv[1])
     output_dir = Path(sys.argv[2]) if len(sys.argv) > 2 else input_dir / "ocr_output"
     
